@@ -67,14 +67,14 @@ def fill_missing_values(dataset):
 
 def preprocess_dataset(dataset) -> pd.DataFrame:
     dataset = dataset.copy()
-    correl(dataset, 0.6)
     fill_missing_values(dataset)
+    dataset = correl(dataset, 0.6)
     return dataset
 
 
 def process_decision_tree(dataset):
-    dataset = preprocess_dataset(dataset)
     y = dataset.pop("quality").values
+    dataset = preprocess_dataset(dataset)
     x = dataset.values
     clf = DecisionTreeClassifier(criterion="entropy")
     clf.fit(x, y)
@@ -87,8 +87,8 @@ def process_decision_tree(dataset):
 
 
 def process_gain_ratio(dataset):
-    dataset = preprocess_dataset(dataset)
     y = dataset.pop("quality").values
+    dataset = preprocess_dataset(dataset)
     for c in dataset.columns:
         dataset[c] = pd.cut(dataset[c], bins=2, labels=[0, 1])
 
@@ -102,5 +102,3 @@ dataset_red = pd.read_csv("data/winequality-red.csv", delimiter=";")
 dataset_white["type"] = 0
 dataset_red["type"] = 1
 total = pd.concat([dataset_white, dataset_red])
-process_gain_ratio(total)
-process_decision_tree(total)
