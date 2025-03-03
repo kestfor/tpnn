@@ -73,6 +73,7 @@ def preprocess_dataset(dataset) -> pd.DataFrame:
 
 
 def process_decision_tree(dataset):
+    dataset = dataset.copy()
     y = dataset.pop("quality").values
     dataset = preprocess_dataset(dataset)
     x = dataset.values
@@ -87,6 +88,7 @@ def process_decision_tree(dataset):
 
 
 def process_gain_ratio(dataset):
+    dataset = dataset.copy()
     y = dataset.pop("quality").values
     dataset = preprocess_dataset(dataset)
     for c in dataset.columns:
@@ -97,8 +99,22 @@ def process_gain_ratio(dataset):
     return res
 
 
+def convert_to_dataframe(data: dict) -> pd.DataFrame:
+    l = [(v, k) for k, v in data.items()]
+    l.sort(reverse=True)
+    names = [i[1] for i in l]
+    values = [i[0] for i in l]
+    df = pd.DataFrame(names, columns=['feature_name'])
+    df['value'] = values
+    return df
+
+
 dataset_white = pd.read_csv("data/winequality-white.csv", delimiter=";")
 dataset_red = pd.read_csv("data/winequality-red.csv", delimiter=";")
 dataset_white["type"] = 0
 dataset_red["type"] = 1
 total = pd.concat([dataset_white, dataset_red])
+gr = convert_to_dataframe(process_gain_ratio(total))
+dt = convert_to_dataframe(process_decision_tree(total))
+print(gr)
+print(dt)
